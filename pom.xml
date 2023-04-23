@@ -17,7 +17,7 @@
 		<java.version>1.8</java.version>
 		<sonar.projectKey>sonar-demo</sonar.projectKey>
 		<sonar.projectName>sonar-demo</sonar.projectName>
-		<sonar.java.binaries>target/classes</sonar.java.binaries>
+		<sonar.java.binaries>target</sonar.java.binaries>
 		<sonar.host.url>http://127.0.0.1:9100/sonarqube</sonar.host.url>
 		<sonar.token>squ_921addf9d45b1ce8bde9b49e33dd542ca839f3b2</sonar.token>
 	</properties>
