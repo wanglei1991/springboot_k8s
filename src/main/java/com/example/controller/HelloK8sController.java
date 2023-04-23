@@ -15,6 +15,8 @@ public class HelloK8sController {
     @GetMapping("/hello")
     public  String hello(@RequestParam("name") String name){
         String msg = "Hello " + name + " : Welcome to k8s";
+        String b = null;
+        System.out.println(b.getBytes(StandardCharsets.UTF_8));
         log.info("【{}】", msg);
         return msg;
     }
