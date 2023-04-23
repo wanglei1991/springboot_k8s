@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage("SonarQube analysis"){
+          steps {
+          //注意:下面的SonarQube-Server和系统配置SonarQube installations的Name必须一致, 大小写敏感
+            withSonarQubeEnv("mysonarqube"){
+              //执行mvn的命令时使用SonarQube-Scanner检测代码
+              bat 'mvn sonar:sonar'
+            }
+          }
+        }
+
+        stage("Quality Gate") {
+            steps {
+                //代码检测失败,将不再继续执行后面的任务,直接退出,报告返回的超时时长设为5分钟
+                timeout(time: 5,unit: 'MINUTES'){
+                  waitForQualityGate abortPipeline: true
+                }
+              }
+        }
+
+        stage('build') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+
+    }
+}
