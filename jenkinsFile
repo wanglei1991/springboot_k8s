@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage("SonarQube analysis"){
+          steps {
+            withSonarQubeEnv("mysonarqube"){
+              bat 'mvn sonar:sonar'
+            }
+          }
+        }
+
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 5,unit: 'MINUTES'){
+                  waitForQualityGate abortPipeline: true
+                }
+              }
+        }
+
+        stage('build') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+
+    }
+}
