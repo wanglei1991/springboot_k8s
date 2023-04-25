@@ -1,15 +1,16 @@
-def boolean build_results = false
+void setBuildStatus(String message, String state) {
+  step([
+      $class: "GitHubCommitStatusSetter",
+      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/wanglei1991/springboot_k8s"],
+      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
+      errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
+      statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
+  ]);
+}
 pipeline {
     agent any
 
     stages {
-
-        stage("before notifier"){
-          steps {
-            publishChecks conclusion: 'NONE', detailsURL: '${JENKINS_URL}', name: 'SCA and build', status: 'IN_PROGRESS', title: 'SCA and build'
-          }
-        }
-
         stage("SonarQube analysis"){
           steps {
             withSonarQubeEnv("mysonarqube"){
@@ -28,27 +29,16 @@ pipeline {
 
         stage('build') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-
-                    bat 'mvn clean package'
-
-                    //
-                    // If we reached here the above step hasn't failed
-                    //
-                    script { build_results = true }
-                }
+                bat 'mvn clean package'
             }
         }
 
-        stage('after notifier') {
-            steps {
-                script{
-                    if( build_results == true ) {
-                        publishChecks detailsURL: '${JENKINS_URL}', name: 'SCA and build', title: 'SCA and build'
-                    } else {
-                        publishChecks conclusion: 'FAILURE', detailsURL: '${JENKINS_URL}', name: 'SCA and build', title: 'SCA and build'
-                    }
-                }
+        post {
+            success {
+                setBuildStatus("Build succeeded", "SUCCESS");
+            }
+            failure {
+                setBuildStatus("Build failed", "FAILURE");
             }
         }
 
