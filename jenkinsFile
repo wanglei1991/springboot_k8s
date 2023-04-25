@@ -1,7 +1,14 @@
+def boolean build_results = false
 pipeline {
     agent any
 
     stages {
+
+        stage("before notifier"){
+          steps {
+            publishChecks conclusion: 'NONE', detailsURL: '${JENKINS_URL}', name: 'SCA and build', status: 'IN_PROGRESS', title: 'SCA and build'
+          }
+        }
 
         stage("SonarQube analysis"){
           steps {
@@ -21,7 +28,27 @@ pipeline {
 
         stage('build') {
             steps {
-                bat 'mvn clean package'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+
+                    bat 'mvn clean package'
+
+                    //
+                    // If we reached here the above step hasn't failed
+                    //
+                    script { build_results = true }
+                }
+            }
+        }
+
+        stage('after notifier') {
+            steps {
+                script{
+                    if( build_results == true ) {
+                        publishChecks detailsURL: '${JENKINS_URL}', name: 'SCA and build', title: 'SCA and build'
+                    } else {
+                        publishChecks conclusion: 'FAILURE', detailsURL: '${JENKINS_URL}', name: 'SCA and build', title: 'SCA and build'
+                    }
+                }
             }
         }
 
