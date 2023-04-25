@@ -16,6 +16,7 @@ public class HelloK8sController {
     public  String hello(@RequestParam("name") String name){
         String msg = "Hello " + name + " : Welcome to k8s";
         log.info("【{}】", msg);
+        int b = 3/0;
         return msg;
     }
 }
