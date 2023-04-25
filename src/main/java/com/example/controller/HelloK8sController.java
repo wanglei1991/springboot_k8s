@@ -15,7 +15,6 @@ public class HelloK8sController {
     @GetMapping("/hello")
     public  String hello(@RequestParam("name") String name){
         String msg = "Hello " + name + " : Welcome to k8s";
-        int a = 1/0;
         log.info("【{}】", msg);
         return msg;
     }
