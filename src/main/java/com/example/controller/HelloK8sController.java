@@ -18,5 +18,7 @@ public class HelloK8sController {
         String msg = "Hello " + name + " : Welcome to k8s";
         log.info("【{}】", msg);
         return msg;
+
+
     }
 }
